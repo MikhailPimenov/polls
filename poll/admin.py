@@ -3,14 +3,14 @@ from .models import Poll, Question, AnswerOption, UserPoll, UserAnswer
 import nested_admin
 
 
-class AnswerAdminNested(nested_admin.NestedStackedInline):
+class AnswerOptionAdminNested(nested_admin.NestedStackedInline):
     model = AnswerOption
     extra = 2
 
 
 class QuestionAdminNested(nested_admin.NestedStackedInline):
     model = Question
-    inlines = (AnswerAdminNested,)
+    inlines = (AnswerOptionAdminNested,)
 
 
 class PollAdmin(nested_admin.NestedModelAdmin):
@@ -23,17 +23,17 @@ class PollAdmin(nested_admin.NestedModelAdmin):
         return self.readonly_fields
 
 
-class QuestionAdmin(admin.ModelAdmin):
-    model = Question
+class QuestionAdmin(nested_admin.NestedModelAdmin):
+    inlines = (AnswerOptionAdminNested,)
 
 
-class UserAnswerAdmin(admin.StackedInline):
+class UserAnswerAdminNested(nested_admin.NestedStackedInline):
     model = UserAnswer
     extra = 0
 
 
-class UserPollAdmin(admin.ModelAdmin):
-    inlines = (UserAnswerAdmin,)
+class UserPollAdmin(nested_admin.NestedModelAdmin):
+    inlines = (UserAnswerAdminNested,)
 
 
 admin.site.register(Poll, PollAdmin)
