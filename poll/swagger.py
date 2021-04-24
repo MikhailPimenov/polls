@@ -289,4 +289,3 @@ class UserPollGetParametersForDocumentation:
 user_poll_put_parameters_for_documentation = UserPollPutParametersForDocumentation()
 user_poll_get_parameters_for_documentation = UserPollGetParametersForDocumentation()
 user_poll_delete_parameters_for_documentation = UserPollDeleteParametersForDocumentation()
-
