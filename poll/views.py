@@ -1,13 +1,17 @@
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.response import Response
-from .serializers import PollSerializer, UserPollSerializer, PollShortSerializer
-from .models import Poll, UserPoll, Question
-from rest_framework.generics import GenericAPIView
 from drf_yasg2.utils import swagger_auto_schema
-from .swagger import user_poll_put_parameters_for_documentation, \
-    poll_get_parameters_for_documentation, user_poll_delete_parameters_for_documentation, \
-    user_poll_get_parameters_for_documentation
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
+
+from .models import Poll, Question, UserPoll
+from .serializers import PollSerializer, PollShortSerializer, UserPollSerializer
+from .swagger import (
+    poll_get_parameters_for_documentation,
+    user_poll_delete_parameters_for_documentation,
+    user_poll_get_parameters_for_documentation,
+    user_poll_put_parameters_for_documentation
+)
 
 
 class PollAPIView(GenericAPIView):
@@ -142,7 +146,10 @@ class UserPollsAPIView(GenericAPIView):
         serializer.set_question_ids(question_ids)
 
         if not self.are_question_ids_valid(question_ids, poll_id):
-            return Response({"error": f'poll={poll_id} does not have questions you listed'}, status=400)
+            return Response(
+                {"error": f'poll={poll_id} does not have questions you listed'},
+                status=400
+            )
 
         if not serializer.is_valid(raise_exception=True):
             return Response({"error": serializer.errors}, status=400)
@@ -160,12 +167,16 @@ class UserPollsAPIView(GenericAPIView):
     def put(self, request):
         """Creates new or updates existing user_poll"""
         if "user_id" not in request.query_params or "poll_id" not in request.query_params:
-            return Response({"error": "request parameters do not contain 'user_id' or/and 'poll_id'"},
-                            status=400)
+            return Response(
+                {"error": "request parameters do not contain 'user_id' or/and 'poll_id'"},
+                status=400
+            )
 
         if not Poll.objects.filter(id=request.query_params["poll_id"]).exists():
-            return Response({"error": f'poll with id={request.query_params["poll_id"]} does not exist'},
-                            status=404)
+            return Response(
+                {"error": f'poll with id={request.query_params["poll_id"]} does not exist'},
+                status=404
+            )
 
         try:
             return self.template_for_create_and_update(
@@ -187,8 +198,10 @@ class UserPollsAPIView(GenericAPIView):
     def delete(request):
         """Delete user_poll with user_id and poll_id"""
         if "user_id" not in request.query_params or "poll_id" not in request.query_params:
-            return Response({"error": "request parameters do not contain 'user_id' or/and 'poll_id'"},
-                            status=400)
+            return Response(
+                {"error": "request parameters do not contain 'user_id' or/and 'poll_id'"},
+                status=400
+            )
 
         user_id = int(request.query_params["user_id"])
         poll_id = int(request.query_params["poll_id"])
@@ -198,54 +211,14 @@ class UserPollsAPIView(GenericAPIView):
         except ValueError:
             return Response({"error": "invalid request parameters"}, status=400)
         except ObjectDoesNotExist:
-            return Response({"message": f'user_poll user_id={user_id} poll={poll_id} was not found'},
-                            status=404)
+            return Response(
+                {"message": f'user_poll user_id={user_id} poll={poll_id} was not found'},
+                status=404
+            )
         user_poll.delete()
-        return Response({"success": f'user_poll user_id={user_id} poll={poll_id} was deleted successfully'},
-                        status=200)
-
-
-class PollAPIView(GenericAPIView):
-    serializer_class = PollSerializer
-
-    @staticmethod
-    def get_queryset():
-        return Poll.objects.all()
-
-    @staticmethod
-    def get_poll_with_id(poll_id):
-        try:
-            poll = Poll.objects.get(id=poll_id)
-            serializer = PollSerializer(poll)
-            return Response(serializer.data, status=200)
-        except ValueError:
-            return Response({"error": "invalid request parameters"}, status=400)
-        except ObjectDoesNotExist:
-            return Response({"error": f'poll with id={poll_id} does not exist'}, status=404)
-
-    @staticmethod
-    def get_available_only_polls():
-        polls = Poll.objects.filter(
-            start_date__lte=datetime.datetime.now(),
-            end_date__gte=datetime.datetime.now()
+        return Response(
+            {"success": f'user_poll user_id={user_id} poll={poll_id} was deleted successfully'},
+            status=200
         )
-        serializer = PollShortSerializer(polls, many=True)
-        return Response(serializer.data, status=200)
 
-    def get_all_polls(self):
-        polls = self.get_queryset()
-        serializer = PollShortSerializer(polls, many=True)
-        return Response(serializer.data, status=200)
 
-    @swagger_auto_schema(**poll_get_parameters_for_documentation.get_parameters())
-    def get(self, request):
-        """Get all/all available/the exact(extended) poll(s)"""
-        if "poll_id" in request.query_params:
-            poll_id = request.query_params["poll_id"]
-            return self.get_poll_with_id(poll_id)
-
-        if "available_only" in request.query_params \
-                and str(request.query_params["available_only"]).lower() == 'true':
-            return self.get_available_only_polls()
-
-        return self.get_all_polls()

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Poll, Question, AnswerOption, UserPoll, UserAnswer
+
+from .models import AnswerOption, Poll, Question, UserAnswer, UserPoll
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):

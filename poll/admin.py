@@ -1,19 +1,20 @@
 from django.contrib import admin
-from .models import Poll, Question, AnswerOption, UserPoll, UserAnswer
-import nested_admin
+from nested_admin import nested
+
+from .models import AnswerOption, Poll, Question, UserAnswer, UserPoll
 
 
-class AnswerOptionAdminNested(nested_admin.NestedStackedInline):
+class AnswerOptionAdminNested(nested.NestedStackedInline):
     model = AnswerOption
     extra = 2
 
 
-class QuestionAdminNested(nested_admin.NestedStackedInline):
+class QuestionAdminNested(nested.NestedStackedInline):
     model = Question
     inlines = (AnswerOptionAdminNested,)
 
 
-class PollAdmin(nested_admin.NestedModelAdmin):
+class PollAdmin(nested.NestedModelAdmin):
     inlines = (QuestionAdminNested,)
     extra = 2
 
@@ -23,16 +24,16 @@ class PollAdmin(nested_admin.NestedModelAdmin):
         return self.readonly_fields
 
 
-class QuestionAdmin(nested_admin.NestedModelAdmin):
+class QuestionAdmin(nested.NestedModelAdmin):
     inlines = (AnswerOptionAdminNested,)
 
 
-class UserAnswerAdminNested(nested_admin.NestedStackedInline):
+class UserAnswerAdminNested(nested.NestedStackedInline):
     model = UserAnswer
     extra = 0
 
 
-class UserPollAdmin(nested_admin.NestedModelAdmin):
+class UserPollAdmin(nested.NestedModelAdmin):
     inlines = (UserAnswerAdminNested,)
 
 
