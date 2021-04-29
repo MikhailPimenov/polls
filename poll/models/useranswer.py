@@ -9,7 +9,12 @@ class UserAnswer(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
-    question = models.ForeignKey('Question', null=True, blank=True, on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        'Question',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     text = models.CharField(null=True, blank=True, max_length=20)
 
     class Meta:

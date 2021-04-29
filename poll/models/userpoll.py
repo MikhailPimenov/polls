@@ -8,6 +8,7 @@ class UserPoll(models.Model):
     class Meta:
         verbose_name = 'user_poll'
         verbose_name_plural = 'user_polls'
+        unique_together = ('user_id', 'poll')
 
     def __str__(self):
         return f'user_poll {self.id} user: {self.user_id} poll: {self.poll.id}'
