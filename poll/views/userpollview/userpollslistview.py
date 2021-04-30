@@ -1,12 +1,7 @@
 from django.http import Http404
 from rest_framework import generics
-
-from ..models import UserPoll
-from ..serializers import UserPollCreateUpdateSerializer, UserPollDetailSerializer
-
-
-class UserPollCreateView(generics.CreateAPIView):
-    serializer_class = UserPollCreateUpdateSerializer
+from ...serializers import UserPollDetailSerializer
+from ...models import UserPoll
 
 
 class UserPollsListView(generics.ListAPIView):
