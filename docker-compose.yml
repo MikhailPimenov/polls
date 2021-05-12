@@ -1,0 +1,17 @@
+version: "3.9"
+   
+services:
+  web:
+    build: .
+    image: django_web_image
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+
+  migration:
+    image: django_web_image
+    command: python manage.py migrate --noinput
+    volumes:
+      - .:/code
